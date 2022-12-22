@@ -6,8 +6,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      python-version: "3.11"
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python
