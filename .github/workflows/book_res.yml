@@ -1,7 +1,7 @@
 name: Book Reservation
 on:
   schedule:
-    - cron: '00 05 * * *'
+    - cron: '07 19 * * *'
 
 jobs:
   build-and-run:
