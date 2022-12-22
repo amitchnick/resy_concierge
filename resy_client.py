@@ -51,6 +51,7 @@ class ResyAPI():
             slots = self._find(venue_id=venue_id, party_size=party_size, date=date)
             if slots:
                 slot_tokens = [s["config"]["token"] for s in slots]
+                LOGGER.info(f"Found slots! Num available: {len(slot_tokens)}")
                 return slot_tokens
             retries_remaining-=1
         return []
@@ -91,7 +92,7 @@ class ResyAPI():
                     return self._book(book_token=book_token)
                 except Exception:
                     continue
-        raise ValueError("Could not book reservation, no times available.")
+        raise ValueError("Could not book reservation, none of the desired times are available.")
 
     def format_headers(self):
         return {
