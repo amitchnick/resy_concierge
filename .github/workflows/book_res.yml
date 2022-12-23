@@ -16,4 +16,4 @@ jobs:
         pip install -r requirements.txt
     - name: Book reservation
       run: |
-        python concierge.py --email ${{ secrets.USER_EMAIL }} --password ${{ secrets.USER_PASSWORD }} --api-key ${{ secrets.API_KEY }} --venue-id 443 --party-size 2 --times 19:00:00 19:30:00 20:00:00 --date 2023-01-05 --time-to-book 05:00
+        python concierge.py --email ${{ secrets.USER_EMAIL }} --password ${{ secrets.USER_PASSWORD }} --api-key ${{ secrets.API_KEY }} --venue-id 443 --party-size 2 --times 19:00:00 19:30:00 20:00:00 --date 2023-01-06 --time-to-book 05:00
