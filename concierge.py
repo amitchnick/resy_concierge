@@ -2,7 +2,7 @@ import argparse
 
 from resy_client import ResyAPI
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import utils
 import time
 
@@ -22,23 +22,28 @@ def parse_args():
     parser.add_argument('--time-to-book', type=str, help="Time that the reservations come out")
     return parser.parse_args()
 
+def get_next_booking_time(time_to_book: str) -> datetime:
+    hour, minute = time_to_book.split(":")
+    now = datetime.now()
+    next_time_to_book = datetime(now.year, now.month, now.day, hour=int(hour), minute=int(minute), second=0, microsecond=0)
+    if now > next_time_to_book:
+        next_time_to_book += timedelta(days=1)
+    return (next_time_to_book - timedelta(seconds=2))
+    
 
 def main():
     args = parse_args()
-    hour, minute = args.time_to_book.split(":")
+    time_to_book = get_next_booking_time(args.time_to_book)
     res = ResyAPI(user_email=args.email, user_password=args.password, api_key=args.api_key)
     res.authenticate()
-    
-    while True:
-        now = datetime.now()
-        if now.hour == int(hour) and now.minute == int(minute):
-            start = time.time()
-            LOGGER.info(f"Attempting to swipe reservation with parameters: Date: {args.date}, Times: {args.times}, Party Size: {args.party_size}")
-            successful_booking = res.book_reservation(venue_id=args.venue_id, party_size=args.party_size, date=args.date, times=args.times)
-            end = time.time()
-            LOGGER.info(f"Total time to swipe reservation: {end - start} seconds")
-            LOGGER.info(f"Booking was a success! Reservation info: {successful_booking}")
-            break
+    LOGGER.info("Sleeping until it's time to book")
+    time.sleep(time_to_book.timestamp() - datetime.now().timestamp())
+    start = time.time()
+    LOGGER.info(f"Time to book! Attempting to swipe reservation with parameters: Date: {args.date}, Times: {args.times}, Party Size: {args.party_size}")
+    successful_booking = res.book_reservation(venue_id=args.venue_id, party_size=args.party_size, date=args.date, times=args.times)
+    end = time.time()
+    LOGGER.info(f"Total time to swipe reservation: {end - start} seconds")
+    LOGGER.info(f"Booking was a success! Reservation info: {successful_booking}")
 
 if __name__ == "__main__":
     main()
