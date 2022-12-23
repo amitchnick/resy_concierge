@@ -25,7 +25,7 @@ def parse_args():
 def get_next_booking_time(time_to_book: str) -> datetime:
     hour, minute = time_to_book.split(":")
     now = datetime.now()
-    next_time_to_book = datetime(now.year, now.month, now.day, hour=hour, minute=minute, second=0, microsecond=0)
+    next_time_to_book = datetime(now.year, now.month, now.day, hour=int(hour), minute=int(minute), second=0, microsecond=0)
     if now > next_time_to_book:
         next_time_to_book += timedelta(days=1)
     return (next_time_to_book - timedelta(seconds=2))
