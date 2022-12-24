@@ -3,6 +3,7 @@ from typing import List
 import requests
 from urllib import parse
 from constants import RESY_URL
+from datetime import datetime, timedelta
 
 from utils import get_logger, extract_time_from_token
 
@@ -42,18 +43,18 @@ class ResyAPI():
                         venue_id: int, 
                         party_size: int, 
                         date: str,
-                        num_retries: int = 5) -> List[str]:
+                        retry_seconds: int = 10) -> List[str]:
         """Returns list of reservation tokens for available slots"""
-               
-        retries_remaining = num_retries
-        while retries_remaining:
-            LOGGER.info(f"Attempting to find available reservation. Attempt number: {num_retries - retries_remaining}")
+        retry_until = datetime.now() + timedelta(seconds=retry_seconds)     
+        num_tries = 1
+        while datetime.now() < retry_until:
+            LOGGER.info(f"Attempting to find available reservation... Attempt number: {num_tries}")
             slots = self._find(venue_id=venue_id, party_size=party_size, date=date)
             if slots:
                 slot_tokens = [s["config"]["token"] for s in slots]
                 LOGGER.info(f"Found slots! Num available: {len(slot_tokens)}")
                 return slot_tokens
-            retries_remaining-=1
+            num_tries += 1
         return []
     
     def _get_booking_token(self, config_id: str, date: str, party_size: int):
