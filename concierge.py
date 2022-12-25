@@ -28,7 +28,7 @@ def get_next_booking_time(time_to_book: str) -> datetime:
     next_time_to_book = datetime(now.year, now.month, now.day, hour=int(hour), minute=int(minute), second=0, microsecond=0)
     if now > next_time_to_book:
         next_time_to_book += timedelta(days=1)
-    return (next_time_to_book - timedelta(seconds=2))
+    return (next_time_to_book - timedelta(seconds=2, milliseconds=200))
     
 
 def main():
@@ -41,9 +41,12 @@ def main():
     start = time.time()
     LOGGER.info(f"Time to book! Attempting to swipe reservation with parameters: Date: {args.date}, Times: {args.times}, Party Size: {args.party_size}")
     successful_booking = res.book_reservation(venue_id=args.venue_id, party_size=args.party_size, date=args.date, times=args.times)
-    end = time.time()
-    LOGGER.info(f"Total time to swipe reservation: {end - start} seconds")
-    LOGGER.info(f"Booking was a success! Reservation info: {successful_booking}")
+    if successful_booking:
+        end = time.time()
+        LOGGER.info(f"Total time to swipe reservation: {end - start} seconds")
+        LOGGER.info(f"Booking was a success! Reservation info: {successful_booking}")
+    else:
+        LOGGER.info("Failed to book reservation in time :(")
 
 if __name__ == "__main__":
     main()

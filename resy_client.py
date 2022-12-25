@@ -87,13 +87,14 @@ class ResyAPI():
                 try:
                     LOGGER.info(f"Attempting secure booking token for time {time}.")
                     book_token = self._get_booking_token(config_id=time_to_token[time], 
-                                           date=date, 
-                                           party_size=party_size)
+                                        date=date, 
+                                        party_size=party_size)
                     
                     return self._book(book_token=book_token)
                 except Exception:
                     continue
-        raise ValueError("Could not book reservation, none of the desired times are available.")
+        LOGGER.info(f"Could not book times requested. Times available: {time_to_token.keys()}")
+        return False
 
     def format_headers(self):
         return {
