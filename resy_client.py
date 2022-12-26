@@ -93,7 +93,7 @@ class ResyAPI():
                     return self._book(book_token=book_token)
                 except Exception:
                     continue
-        LOGGER.info(f"Could not book times requested. Times available: {time_to_token.keys()}")
+        LOGGER.info(f"Could not book times requested. Times available: {list(time_to_token.keys())}")
         return False
 
     def format_headers(self):
