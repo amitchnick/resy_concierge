@@ -1,4 +1,5 @@
 from typing import List
+import json
 
 import requests
 from urllib import parse
@@ -57,7 +58,7 @@ class ResyAPI():
             num_tries += 1
         return []
     
-    def _get_booking_token(self, config_id: str, date: str, party_size: int):
+    def _get_booking_token_and_payment(self, config_id: str, date: str, party_size: int):
         details_url = parse.urljoin(RESY_URL, f"3/details")
         response = requests.get(details_url, 
                     params={"config_id": config_id, 
@@ -66,12 +67,15 @@ class ResyAPI():
                             },
                     headers=self.format_headers())
         details = response.json()
-        return details["book_token"]["value"]
+        book_token = details["book_token"]["value"]
+        default_payment_id = details["user"]["payment_methods"][0]["id"]
+        return book_token, default_payment_id
 
-    def _book(self, book_token: str):
+    def _book(self, book_token: str, payment_id: int):
         booking_url = parse.urljoin(RESY_URL, f"3/book")
+        struct_payment_method = {"id": payment_id}
         response = requests.post(booking_url, 
-                    data={"book_token": book_token},
+                    data={"book_token": book_token, "struct_payment_method": json.dumps(struct_payment_method)},
                     headers=self.format_headers())
         return response.json()
 
@@ -86,11 +90,11 @@ class ResyAPI():
             if time_to_token.get(time): 
                 try:
                     LOGGER.info(f"Attempting secure booking token for time {time}.")
-                    book_token = self._get_booking_token(config_id=time_to_token[time], 
+                    book_token, payment_id = self._get_booking_token_and_payment(config_id=time_to_token[time], 
                                         date=date, 
                                         party_size=party_size)
                     
-                    return self._book(book_token=book_token)
+                    return self._book(book_token=book_token, payment_id=payment_id)
                 except Exception:
                     continue
         LOGGER.info(f"Could not book times requested. Times available: {list(time_to_token.keys())}")
