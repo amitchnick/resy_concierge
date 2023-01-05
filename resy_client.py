@@ -28,9 +28,11 @@ class ResyAPI():
     
     def _find(self, venue_id: int, 
                         party_size: int, 
-                        date: str,):
+                        date: str,
+                        num_retries: int = 3):
             find_url = parse.urljoin(RESY_URL, f"4/find")
-            response = requests.get(find_url, 
+            try:
+                response = requests.get(find_url, 
                         params={"lat": 0, 
                                 "long": 0, 
                                 "day": date, 
@@ -38,7 +40,11 @@ class ResyAPI():
                                 "venue_id": venue_id
                                 },
                         headers=self.format_headers())
-            return response.json()["results"]["venues"][0]["slots"]
+                slots = response.json()["results"]["venues"][0]["slots"]
+                return slots
+            except Exception:
+                if num_retries:
+                    self._find(venue_id, party_size, date, num_retries-1)
     
     def find_reservations(self, 
                         venue_id: int, 
