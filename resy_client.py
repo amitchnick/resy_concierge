@@ -93,8 +93,10 @@ class ResyAPI():
                     book_token, payment_id = self._get_booking_token_and_payment(config_id=time_to_token[time], 
                                         date=date, 
                                         party_size=party_size)
-                    
-                    return self._book(book_token=book_token, payment_id=payment_id)
+                    LOGGER.info("Trying to book...")
+                    booking_response = self._book(book_token=book_token, payment_id=payment_id)
+                    if booking_response.get('resy_token'):
+                        return booking_response # return response if it was a success, otherwise try the next time
                 except Exception:
                     continue
         LOGGER.info(f"Could not book times requested. Times available: {list(time_to_token.keys())}")
