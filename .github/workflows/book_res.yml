@@ -16,11 +16,12 @@ jobs:
         pip install -r requirements.txt
     - name: Book reservation
       uses: nick-fields/retry@v2
-      timeout_minutes: 360
+      with:
+        timeout_minutes: 360
         max_attempts: 4
         command: |
           python concierge.py --email ${{ secrets.USER_EMAIL }} --password ${{ secrets.USER_PASSWORD }} --api-key ${{ secrets.API_KEY }} --venue-id 1505 --party-size 2 --times 18:30:00 18:45:00 19:00:00 19:30:00 19:45:00 20:00:00 --date 2023-01-13 --time-to-book 14:00
-        
+      
   book-reservation-2:
     runs-on: ubuntu-latest
     steps:
