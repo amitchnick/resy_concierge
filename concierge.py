@@ -33,7 +33,7 @@ def get_next_booking_time(time_to_book: str) -> datetime:
 
 def main():
     args = parse_args()
-    time_to_book = get_next_booking_time(args.time_to_book) - timedelta(milliseconds=500)
+    time_to_book = get_next_booking_time(args.time_to_book) - timedelta(milliseconds=300)
     res = ResyAPI(user_email=args.email, user_password=args.password, api_key=args.api_key)
     res.authenticate()
     LOGGER.info("Sleeping until it's time to book")
