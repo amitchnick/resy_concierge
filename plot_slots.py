@@ -8,6 +8,7 @@ import utils
 import time
 
 from matplotlib import pyplot as plt
+from matplotlib import dates
 from concurrent.futures import ThreadPoolExecutor, Future
 
 LOGGER = utils.get_logger(__name__)
@@ -38,9 +39,12 @@ def plot_slots(results: Dict[datetime, Future], fig_name: str):
     for t, future in results.items():
         slots = future.result()
         LOGGER.info(f"Launching at time {t} got slots {slots}")
-        x.append(t.timestamp())
+        x.append(t)
         y.append(len(slots))
-    plt.scatter(x, y)
+    x_dates = dates.date2num(x)
+    plt.plot_date(x_dates, y)
+    plt.xlabel("Booking time")
+    plt.ylabel("Num reservations available")
     plt.savefig(fig_name)
 
 def main():
@@ -50,7 +54,7 @@ def main():
     res = ResyAPI(user_email=args.email, user_password=args.password, api_key=args.api_key)
     res.authenticate()
     results = {}
-    with ThreadPoolExecutor(max_workers=10) as executer:
+    with ThreadPoolExecutor(max_workers=len(booking_times)) as executer:
         for t in booking_times:
             results[t] = executer.submit(wait_and_find_slots, t, args.venue_id, args.party_size, args.date, res)
     plot_slots(results=results, fig_name=f"{args.venue_id}_{args.date}.png")
