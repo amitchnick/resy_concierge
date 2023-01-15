@@ -45,8 +45,8 @@ def plot_slots(results: Dict[datetime, Future], fig_name: str):
 
 def main():
     args = parse_args()
-    base_booking_time = utils.get_next_booking_time(args.time_to_book) - timedelta(seconds=1)
-    booking_times = [base_booking_time - timedelta(milliseconds=x) for x in range(1000, 0, -10)]
+    base_booking_time = utils.get_next_booking_time(args.time_to_book) + timedelta(seconds=1)
+    booking_times = [base_booking_time - timedelta(milliseconds=x) for x in range(2000, 0, -10)]
     res = ResyAPI(user_email=args.email, user_password=args.password, api_key=args.api_key)
     res.authenticate()
     results = {}
