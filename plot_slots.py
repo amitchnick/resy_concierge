@@ -29,7 +29,7 @@ def parse_args():
 def wait_and_find_slots(booking_time: datetime, venue_id: int, party_size: int, date: str, resy_client: ResyAPI):
     LOGGER.info(f"Sleeping until booking time: {booking_time}")
     time.sleep(booking_time.timestamp() - datetime.now().timestamp())
-    LOGGER.info(f"Time to find slots! Attempting to swipe reservation with parameters: Date: {date}, Party Size: {party_size}")
+    LOGGER.info(f"Time to find slots! Parameters: Date: {date}, Party Size: {party_size}")
     return resy_client.find_reservations(venue_id, party_size, date)
     
 
