@@ -8,3 +8,12 @@ RESTAURANT_TO_VENUE_ID = {
     "4 Charles Prime Rib": 834,
     "Bistecca": 3207
 }
+
+VENUE_ID_TO_RESTAURANT_NAME = {
+    2: "Rosemary's",
+    443: "I Sodi",
+    58848: "Laser Wolf",
+    1505: "Don Angie",
+    834: "4 Charles Prime Rib",
+    3207: "Bistecca"
+}

@@ -22,18 +22,10 @@ def parse_args():
     parser.add_argument('--time-to-book', type=str, help="Time that the reservations come out")
     return parser.parse_args()
 
-def get_next_booking_time(time_to_book: str) -> datetime:
-    hour, minute = time_to_book.split(":")
-    now = datetime.now()
-    next_time_to_book = datetime(now.year, now.month, now.day, hour=int(hour), minute=int(minute), second=0, microsecond=0)
-    if now > next_time_to_book:
-        next_time_to_book += timedelta(days=1)
-    return next_time_to_book
-    
 
 def main():
     args = parse_args()
-    time_to_book = get_next_booking_time(args.time_to_book) - timedelta(milliseconds=500)
+    time_to_book = utils.get_next_booking_time(args.time_to_book) - timedelta(milliseconds=500)
     res = ResyAPI(user_email=args.email, user_password=args.password, api_key=args.api_key)
     res.authenticate()
     LOGGER.info("Sleeping until it's time to book")
