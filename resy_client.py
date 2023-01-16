@@ -77,13 +77,22 @@ class ResyAPI():
         default_payment_id = details["user"]["payment_methods"][0]["id"]
         return book_token, default_payment_id
 
-    def _book(self, book_token: str, payment_id: int):
+    def _book(self, book_token: str, payment_id: int, retry_seconds: int = 2):
         booking_url = parse.urljoin(RESY_URL, f"3/book")
         struct_payment_method = {"id": payment_id}
-        response = requests.post(booking_url, 
+        retry_until = datetime.now() + timedelta(seconds=retry_seconds)
+        num_tries = 1
+        booking_response = {}
+        while datetime.now() < retry_until:
+            LOGGER.info(f"Attempting to secure booking... Attempt number: {num_tries}")
+            response = requests.post(booking_url, 
                     data={"book_token": book_token, "struct_payment_method": json.dumps(struct_payment_method)},
                     headers=self.format_headers())
-        return response.json()
+            booking_response = response.json()
+            if booking_response.get('resy_token'):
+                return booking_response # return response if it was a success, otherwise retry
+            num_tries += 1
+        return booking_response
 
     def book_reservation(self, 
                         times: List[str],
@@ -99,7 +108,7 @@ class ResyAPI():
                     book_token, payment_id = self._get_booking_token_and_payment(config_id=time_to_token[time], 
                                         date=date, 
                                         party_size=party_size)
-                    LOGGER.info("Trying to book...")
+                    LOGGER.info("Received token. Trying to book.")
                     booking_response = self._book(book_token=book_token, payment_id=payment_id)
                     if booking_response.get('resy_token'):
                         return booking_response # return response if it was a success, otherwise try the next time
