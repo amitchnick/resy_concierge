@@ -38,7 +38,8 @@ def plot_slots(results: Dict[datetime, Future], fig_name: str):
     y = []
     for t, future in results.items():
         slots = future.result()
-        LOGGER.info(f"Launching at time {t} got slots {slots}")
+        times = [utils.extract_time_from_token(config_id) for config_id in slots]
+        LOGGER.info(f"Launching at time {t} got res times: {times}")
         x.append(t)
         y.append(len(slots))
     x_dates = dates.date2num(x)
