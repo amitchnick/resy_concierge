@@ -23,7 +23,7 @@ jobs:
         max_attempts: 4
         retry_on: timeout
         command: |
-          python concierge.py --email ${{ secrets.ABEL_EMAIL }} --password ${{ secrets.ABEL_PASSWORD }} --api-key ${{ secrets.ABEL_API_KEY }} --venue-id 3207 --party-size 2 --times 19:00:00 19:30:00 19:45:00 20:00:00 20:30:00 --date 2023-02-15 --time-to-book 11:00
+          python concierge.py --email ${{ secrets.USER_EMAIL }} --password ${{ secrets.USER_PASSWORD }} --api-key ${{ secrets.API_KEY }} --venue-id 3207 --party-size 2 --times 19:00:00 19:30:00 19:45:00 20:00:00 20:30:00 --date 2023-02-15 --time-to-book 11:00
     
   book-reservation-2:
     runs-on: ubuntu-latest
