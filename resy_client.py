@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor
 from typing import List
 import json
 
@@ -94,28 +95,38 @@ class ResyAPI():
             num_tries += 1
         return booking_response
 
-    def book_reservation(self, 
+    def secure_booking(self, time: str, config_id: str, date: str, party_size: int):
+        LOGGER.info(f"Attempting secure booking token for time {time}.")
+        book_token, payment_id = self._get_booking_token_and_payment(config_id=config_id, 
+                            date=date, 
+                            party_size=party_size)
+        LOGGER.info("Received token. Trying to book.")
+        booking_response = self._book(book_token=book_token, payment_id=payment_id)
+        return booking_response.get('resy_token')
+
+    def book_reservation_multithreaded(self, 
                         times: List[str],
                         venue_id: int, 
                         party_size: int, 
                         date: str,):
         res_config_ids = self.find_reservations(venue_id=venue_id, party_size=party_size, date=date)
         time_to_token = {extract_time_from_token(config_id): config_id for config_id in res_config_ids}
-        for time in times:
-            if time_to_token.get(time): 
-                try:
-                    LOGGER.info(f"Attempting secure booking token for time {time}.")
-                    book_token, payment_id = self._get_booking_token_and_payment(config_id=time_to_token[time], 
-                                        date=date, 
-                                        party_size=party_size)
-                    LOGGER.info("Received token. Trying to book.")
-                    booking_response = self._book(book_token=book_token, payment_id=payment_id)
-                    if booking_response.get('resy_token'):
-                        return booking_response # return response if it was a success, otherwise try the next time
-                except Exception:
-                    continue
-        LOGGER.info(f"Could not book times requested. Times available: {list(time_to_token.keys())}")
-        return False
+        results = {}
+        with ThreadPoolExecutor(max_workers=len(times)) as executer:
+            for t in times:
+                if time_to_token.get(t):
+                    results[t] = executer.submit(self.secure_booking, t, time_to_token[t], date, party_size)
+        reservations_acquired = []
+        for t, future in results.items():
+            token = future.result()
+            if token:
+                reservations_acquired.append(t)
+        
+        if reservations_acquired:
+            LOGGER.info(f"Reservation(s) booked! Times: {reservations_acquired}")
+        else:
+            LOGGER.info(f"Could not book times requested. Times available upon querying: {list(time_to_token.keys())}")
+        return reservations_acquired
 
     def format_headers(self):
         return {
