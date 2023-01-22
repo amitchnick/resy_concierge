@@ -1,7 +1,7 @@
 name: Book Reservation
 on:
   schedule:
-  - cron: "30 13 * * *"
+  - cron: "00 13 * * *"
 
 jobs:
   book-reservation-1:
@@ -23,7 +23,7 @@ jobs:
         max_attempts: 4
         retry_on: timeout
         command: |
-          python concierge.py --email ${{ secrets.USER_EMAIL }} --password ${{ secrets.USER_PASSWORD }} --api-key ${{ secrets.API_KEY }} --venue-id 1505 --party-size 2 --times 19:00:00 19:30:00 19:45:00 20:00:00 20:30:00 --date 2023-01-24 --time-to-book 14:00
+          python concierge.py --email ${{ secrets.USER_EMAIL }} --password ${{ secrets.USER_PASSWORD }} --api-key ${{ secrets.API_KEY }} --venue-id 834 --party-size 4 --times 19:30:00 19:00:00 19:45:00 20:00:00 20:30:00 --date 2023-02-20 --time-to-book 14:00
     
   book-reservation-2:
     runs-on: ubuntu-latest
