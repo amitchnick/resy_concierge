@@ -23,5 +23,5 @@ jobs:
         max_attempts: 4
         retry_on: timeout
         command: |
-          python concierge.py --email ${{ secrets.USER_EMAIL }} --password ${{ secrets.USER_PASSWORD }} --api-key ${{ secrets.API_KEY }} --venue-id 443 --party-size 4 --times 18:30:00 18:45:00 18:00:00 19:00:00 19:15:00 19:30:00  --date 2023-02-05 --time-to-book 00:00
+          python concierge.py --email ${{ secrets.USER_EMAIL }} --password ${{ secrets.USER_PASSWORD }} --api-key ${{ secrets.API_KEY }} --venue-id 443 --party-size 2 --times 19:00:00 19:15:00 19:30:00 20:00:00 20:15:00 20:30:00 --date 2023-02-14 --time-to-book 00:00
       
