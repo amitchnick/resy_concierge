@@ -7,7 +7,8 @@ RESTAURANT_TO_VENUE_ID = {
     "Don Angie": 1505,
     "4 Charles Prime Rib": 834,
     "Bistecca": 3207,
-    "Via Carota": 2567
+    "Via Carota": 2567,
+    "L'Artusi": 25973,
 }
 
 VENUE_ID_TO_RESTAURANT_NAME = {
@@ -17,5 +18,6 @@ VENUE_ID_TO_RESTAURANT_NAME = {
     1505: "Don Angie",
     834: "4 Charles Prime Rib",
     3207: "Bistecca",
-    2567: "Via Carota"
+    2567: "Via Carota",
+    25973: "L'Artusi",
 }
