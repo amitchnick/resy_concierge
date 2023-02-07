@@ -1,7 +1,7 @@
-name: Book Reservation 2
+name: Laser Wolf
 on:
   schedule:
-  - cron: "00 13 * * *"
+  - cron: "00 14 * * *"
 
 jobs:
   book-reservation-2:
@@ -23,5 +23,5 @@ jobs:
         max_attempts: 4
         retry_on: timeout
         command: |
-          python concierge.py --email ${{ secrets.ERS_EMAIL }} --password ${{ secrets.ERS_PASSWORD }} --api-key ${{ secrets.API_KEY }} --venue-id 25973 --party-size 2 --times 19:00:00 19:15:00 19:30:00 19:45:00 20:00:00 20:15:00 --date 2023-02-21 --time-to-book 14:00
+          python concierge.py --email ${{ secrets.EH_EMAIL }} --password ${{ secrets.EH_PASSWORD }} --api-key ${{ secrets.API_KEY }} --venue-id 58848 --party-size 4 --times 19:30:00 19:45:00 20:00:00 20:15:00 20:30:00 --date 2023-03-03 --time-to-book 15:00
       

@@ -1,4 +1,4 @@
-name: Book Reservation 1
+name: Don Angie
 on:
   schedule:
   - cron: "00 13 * * *"

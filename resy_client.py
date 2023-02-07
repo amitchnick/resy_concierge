@@ -7,7 +7,7 @@ from urllib import parse
 from constants import RESY_URL
 from datetime import datetime, timedelta
 
-from utils import get_logger, extract_time_from_token
+from utils import get_logger, extract_time_from_token, get_times_to_tokens
 
 LOGGER = get_logger(__name__)
 
@@ -108,9 +108,10 @@ class ResyAPI():
                         times: List[str],
                         venue_id: int, 
                         party_size: int, 
-                        date: str,):
+                        date: str,
+                        indoor_only: bool = False):
         res_config_ids = self.find_reservations(venue_id=venue_id, party_size=party_size, date=date)
-        time_to_token = {extract_time_from_token(config_id): config_id for config_id in res_config_ids}
+        time_to_token = get_times_to_tokens(res_config_ids, indoor_only=indoor_only)
         results = {}
         with ThreadPoolExecutor(max_workers=len(times)) as executer:
             for t in times:

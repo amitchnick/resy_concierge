@@ -2,6 +2,9 @@ import logging
 import sys
 
 from datetime import datetime, timedelta
+from typing import Dict, List
+
+import constants
 
 def get_logger(name: str):
     root = logging.getLogger(name=name)
@@ -20,6 +23,18 @@ def extract_time_from_token(token: str):
     
     split_token = token.split('/')
     return split_token[-3]
+
+def is_outdoor_slot(token: str):
+    """Determine whether or not reservation is outdoors. Token input looks like: 
+    rgs://resy/2/1843946/2/2022-12-18/2022-12-18/20:15:00/2/Indoor Dining"""
+    slot_loc = token.split('/')[-1].lower()
+    return any(kw in slot_loc for kw in constants.OUTDOOR_SLOT_KEYWORDS)
+
+def get_times_to_tokens(config_ids: List[str], indoor_only: bool) -> Dict[str, str]:
+    if indoor_only:
+        return {extract_time_from_token(config_id): config_id for config_id in config_ids if not is_outdoor_slot(config_id)}
+    else:
+        return {extract_time_from_token(config_id): config_id for config_id in config_ids}
 
 def get_next_booking_time(time_to_book: str) -> datetime:
     hour, minute = time_to_book.split(":")
