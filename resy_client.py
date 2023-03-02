@@ -7,7 +7,9 @@ from urllib import parse
 from constants import RESY_URL
 from datetime import datetime, timedelta
 
-from utils import get_logger, extract_time_from_token, get_times_to_tokens
+from tenacity import retry, retry_if_result, stop_after_attempt, stop_after_delay
+
+from utils import get_logger, get_times_to_tokens
 
 LOGGER = get_logger(__name__)
 
@@ -19,6 +21,7 @@ class ResyAPI():
         
         self.auth_token = None
 
+    @retry(stop=stop_after_attempt(10))
     def authenticate(self) -> str:
         """fetch auth token"""
         response = requests.post(parse.urljoin(RESY_URL, f"3/auth/password"), 
@@ -47,23 +50,23 @@ class ResyAPI():
                 if num_retries:
                     self._find(venue_id, party_size, date, num_retries-1)
     
+    def _no_slots(slots: List[str]):
+        return not bool(slots)
+    
+    def _return_last_state(retry_state):
+        return retry_state.outcome.result()
+
+    @retry(stop=stop_after_delay(10), retry=retry_if_result(_no_slots), retry_error_callback=_return_last_state)
     def find_reservations(self, 
                         venue_id: int, 
                         party_size: int, 
-                        date: str,
-                        retry_seconds: int = 10) -> List[str]:
+                        date: str) -> List[str]:
         """Returns list of reservation tokens for available slots"""
-        retry_until = datetime.now() + timedelta(seconds=retry_seconds)     
-        num_tries = 1
-        while datetime.now() < retry_until:
-            LOGGER.info(f"Attempting to find available reservation... Attempt number: {num_tries}")
-            slots = self._find(venue_id=venue_id, party_size=party_size, date=date)
-            if slots:
-                slot_tokens = [s["config"]["token"] for s in slots]
-                LOGGER.info(f"Found slots! Num available: {len(slot_tokens)}")
-                return slot_tokens
-            num_tries += 1
-        return []
+        LOGGER.info(f"Attempting to find available reservation...")
+        slots = self._find(venue_id=venue_id, party_size=party_size, date=date)
+        slot_tokens = [s["config"]["token"] for s in slots]
+        LOGGER.info(f"Found {len(slots)} available slots.")
+        return slot_tokens
     
     def _get_booking_token_and_payment(self, config_id: str, date: str, party_size: int):
         details_url = parse.urljoin(RESY_URL, f"3/details")

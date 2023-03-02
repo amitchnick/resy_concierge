@@ -30,7 +30,7 @@ def main():
     res = ResyAPI(user_email=args.email, user_password=args.password, api_key=args.api_key)
     res.authenticate()
     LOGGER.info("Sleeping until it's time to book")
-    time.sleep(time_to_book.timestamp() - datetime.now().timestamp())
+    # time.sleep(time_to_book.timestamp() - datetime.now().timestamp())
     start = time.time()
     LOGGER.info(f"Time to book! Attempting to swipe reservation with parameters: Date: {args.date}, Times: {args.times}, Party Size: {args.party_size}")
     successful_bookings = res.book_reservation_multithreaded(venue_id=args.venue_id, party_size=args.party_size, date=args.date, times=args.times, indoor_only=args.indoor_only)
